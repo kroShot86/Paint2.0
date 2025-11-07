@@ -45,6 +45,23 @@
               "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Paint_2.0\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs*",
+              "RelativeToolTip": "Paint_2.0\\MainWindow.xaml.cs*",
+              "ViewState": "AgIAAAABAAAAAAAAAAAYwFEBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T11:58:07.656Z",
+              "EditorCaption": ""
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "MainWindow.xaml",
@@ -54,19 +71,6 @@
               "RelativeToolTip": "Paint_2.0\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-10-25T11:58:07.773Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "Paint_2.0\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs",
-              "RelativeToolTip": "Paint_2.0\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAPoBAAAAAAAAAAAiwAwCAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-25T11:58:07.656Z",
               "EditorCaption": ""
             }
           ]

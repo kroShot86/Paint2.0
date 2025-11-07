@@ -10,6 +10,9 @@ using System;
 using System.Windows.Threading;
 using System.Windows.Media.Effects;
 
+using System.IO;
+using System.Windows.Controls.Primitives;
+
 namespace Paint_2._0
 {
     public partial class MainWindow : Window
@@ -54,9 +57,21 @@ namespace Paint_2._0
 
         private bool setka_check = false;
 
-        
+        private bool vydel_check = false;
+        private int count_vydel = 0;
+        private Rectangle vydelRect;
+        private Point vydelStart;
+
+        private List<Thumb> resizeThumbs = new List<Thumb>();
+        private Point dragStart;
+
+        private RenderTargetBitmap copiedImage = null; // фигня для копирования
 
         private Stack<RenderTargetBitmap> history = new Stack<RenderTargetBitmap>();
+
+        private List<UIElement> selectedObjects = new List<UIElement>();
+        private Dictionary<UIElement, Point> originalPositions = new Dictionary<UIElement, Point>();
+        private bool isDraggingSelection = false;
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -204,6 +219,28 @@ namespace Paint_2._0
                     FinalizeText();
                 };
             }
+
+            if (vydel_check)
+            {
+                if (vydelRect != null)
+                if (vydelRect.Fill != Miro.Background)
+                    Dell_vydel();
+
+                vydelStart = pos;
+
+                vydelRect = new Rectangle
+                {
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1,
+                    StrokeDashArray = new DoubleCollection { 4, 2 },
+                };
+
+                Canvas.SetLeft(vydelRect, pos.X);
+                Canvas.SetTop(vydelRect, pos.Y);
+
+                Miro.Children.Add(vydelRect);
+
+            }
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
@@ -225,6 +262,11 @@ namespace Paint_2._0
                 treug = null;
             }
 
+            if (vydel_check)
+            {
+                count_vydel++;
+            }
+
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -236,6 +278,19 @@ namespace Paint_2._0
 
             karandash.Points.Add(e.GetPosition(Miro));
             lastik.Points.Add(e.GetPosition(Miro));
+
+            if (vydel_check && vydelRect != null && LKM)
+            {
+                double x = Math.Min(pos.X, vydelStart.X);
+                double y = Math.Min(pos.Y, vydelStart.Y);
+                double w = Math.Abs(pos.X - vydelStart.X);
+                double h = Math.Abs(pos.Y - vydelStart.Y);
+
+                Canvas.SetLeft(vydelRect, x);
+                Canvas.SetTop(vydelRect, y);
+                vydelRect.Width = w;
+                vydelRect.Height = h;
+            }
 
             if (liniy_check && liniy != null)
             {
@@ -420,6 +475,146 @@ namespace Paint_2._0
                     Miro.Children.RemoveAt(Miro.Children.Count - 1);
                 }
             }
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.C)
+            {
+                if(setka_check)
+                {
+                    for (int i = Miro.Children.Count - 1; i >= 0; i--)
+                    {
+                        if (Miro.Children[i] is Line line && line.Stroke == Brushes.LightGray)
+                            Miro.Children.RemoveAt(i);
+                    }
+                }
+
+                Copy();
+
+                if (setka_check)
+                {
+                    double step = 10;
+                    double width = Miro.ActualWidth;
+                    double height = Miro.ActualHeight;
+
+                    for (double y = 0; y < height; y += step)
+                    {
+                        Line line = new Line
+                        {
+                            X1 = 0,
+                            Y1 = y,
+                            X2 = width,
+                            Y2 = y,
+                            Stroke = Brushes.LightGray,
+                            StrokeThickness = 1,
+                            IsHitTestVisible = false
+                        };
+                        Miro.Children.Add(line);
+                    }
+
+                    for (double x = 0; x < width; x += step)
+                    {
+                        Line line = new Line
+                        {
+                            X1 = x,
+                            Y1 = 0,
+                            X2 = x,
+                            Y2 = height,
+                            Stroke = Brushes.LightGray,
+                            StrokeThickness = 1,
+                            IsHitTestVisible = false
+                        };
+                        Miro.Children.Add(line);
+                    }
+                }
+                
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.V)
+            {
+                if (copiedImage != null)
+                {
+                    Cursor = Cursors.Cross;
+                    Miro.MouseLeftButtonDown += vstavit;
+                }
+            }
+
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.X)
+            {
+
+                if (setka_check)
+                {
+                    for (int i = Miro.Children.Count - 1; i >= 0; i--)
+                    {
+                        if (Miro.Children[i] is Line line && line.Stroke == Brushes.LightGray)
+                            Miro.Children.RemoveAt(i);
+                    }
+                }
+
+                Copy();
+                Delite();
+
+                if (setka_check)
+                {
+                    double step = 10;
+                    double width = Miro.ActualWidth;
+                    double height = Miro.ActualHeight;
+
+                    for (double y = 0; y < height; y += step)
+                    {
+                        Line line = new Line
+                        {
+                            X1 = 0,
+                            Y1 = y,
+                            X2 = width,
+                            Y2 = y,
+                            Stroke = Brushes.LightGray,
+                            StrokeThickness = 1,
+                            IsHitTestVisible = false
+                        };
+                        Miro.Children.Add(line);
+                    }
+
+                    for (double x = 0; x < width; x += step)
+                    {
+                        Line line = new Line
+                        {
+                            X1 = x,
+                            Y1 = 0,
+                            X2 = x,
+                            Y2 = height,
+                            Stroke = Brushes.LightGray,
+                            StrokeThickness = 1,
+                            IsHitTestVisible = false
+                        };
+                        Miro.Children.Add(line);
+                    }
+                }
+            }
+
+            if (e.Key == Key.Delete)
+            {
+                Delite();
+            }
+
+            if (e.Key == Key.S)
+            {
+                vydel_check = true;
+                instrument = "Выделение";
+                if (instrumentText != null)
+                    instrumentText.Text = $"Инструмент: — {instrument}";
+                if (vydelRect != null)
+                    if (vydelRect.Fill != Miro.Background)
+                        Dell_vydel();
+
+                karandash_check = false;
+                lastik_check = false;
+                zalivka_check = false;
+                text_check = false;
+                liniy_check = false;
+                pryam_check = false;
+                eleps_check = false;
+
+                StopGlow();
+            }
+
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e) => Close();
@@ -463,6 +658,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             zalivka_check = false;
             lastik_check = false;
             text_check = false;
@@ -470,6 +669,7 @@ namespace Paint_2._0
             pryam_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StopGlow();
         }
@@ -481,6 +681,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             karandash_check = false;
             lastik_check = false;
             text_check = false;
@@ -488,6 +692,7 @@ namespace Paint_2._0
             pryam_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StopGlow();
         }
@@ -499,6 +704,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             zalivka_check = false;
             karandash_check = false;
             text_check = false;
@@ -506,6 +715,7 @@ namespace Paint_2._0
             pryam_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StopGlow();
         }
@@ -517,6 +727,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             lastik_check = false;
             zalivka_check = false;
             karandash_check = false;
@@ -524,6 +738,7 @@ namespace Paint_2._0
             pryam_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StartGlow((Button)sender);
         }
@@ -535,6 +750,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             text_check = false;
             lastik_check = false;
             zalivka_check = false;
@@ -542,6 +761,7 @@ namespace Paint_2._0
             pryam_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StartGlow((Button)sender);
         }
@@ -553,6 +773,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             liniy_check = false;
             karandash_check = false;
             lastik_check = false;
@@ -560,6 +784,7 @@ namespace Paint_2._0
             text_check = false;
             eleps_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StartGlow((Button)sender);
         }
@@ -571,6 +796,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             pryam_check = false;
             liniy_check = false;
             karandash_check = false;
@@ -578,6 +807,7 @@ namespace Paint_2._0
             zalivka_check = false;
             text_check = false;
             treug_check = false;
+            vydel_check = false;
 
             StartGlow((Button)sender);
         }
@@ -589,6 +819,10 @@ namespace Paint_2._0
             if (instrumentText != null)
                 instrumentText.Text = $"Инструмент: — {instrument}";
 
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
             eleps_check = false;
             pryam_check = false;
             liniy_check = false;
@@ -596,8 +830,30 @@ namespace Paint_2._0
             lastik_check = false;
             zalivka_check = false;
             text_check = false;
+            vydel_check = false;
 
             StartGlow((Button)sender);
+        }
+        private void vydel_Click(object sender, RoutedEventArgs e)
+        {
+            vydel_check = true;
+            instrument = "Выделение";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
+            if (vydelRect != null)
+            if (vydelRect.Fill != Miro.Background)
+                Dell_vydel();
+
+            karandash_check = false;
+            lastik_check = false;
+            zalivka_check = false;
+            text_check = false;
+            liniy_check = false;
+            pryam_check = false;
+            eleps_check = false;
+            treug_check = false;
+
+            StopGlow();
         }
 
         void DrawSetka()
@@ -796,6 +1052,415 @@ namespace Paint_2._0
             {
                 Miro.Children.RemoveAt(Miro.Children.Count - 1);
             }
+        }
+
+        private void Dell_vydel()
+        {
+            if (count_vydel == 1)
+            {
+                count_vydel--;
+                for (int i = Miro.Children.Count - 1; i >= 0; i--)
+                {
+                    if (Miro.Children[i] is Rectangle vydelRect)
+                    {
+                        Miro.Children.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void Delite()
+        {
+            if (vydelRect == null || vydelRect.Width == 0 || vydelRect.Height == 0)
+                return;
+
+            vydelRect.Fill = Miro.Background;
+            vydelRect.Stroke = Miro.Background;
+
+            count_vydel--;
+        }
+
+        private void Copy()
+        {
+            if (vydelRect == null || vydelRect.Width == 0 || vydelRect.Height == 0)
+                return;
+
+            vydelRect.Stroke = Miro.Background;
+            SaveCanvasState();
+
+            double x = Canvas.GetLeft(vydelRect);
+            double y = Canvas.GetTop(vydelRect);
+            int width = (int)vydelRect.Width;
+            int height = (int)vydelRect.Height;
+
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+                (int)Miro.ActualWidth,
+                (int)Miro.ActualHeight,
+                96, 96, PixelFormats.Pbgra32);
+            rtb.Render(Miro);
+
+            CroppedBitmap cb = new CroppedBitmap(rtb, new Int32Rect((int)x, (int)y, width, height));
+
+            copiedImage = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                dc.DrawImage(cb, new Rect(0, 0, width, height));
+            }
+            copiedImage.Render(dv);
+            vydelRect.Stroke = Brushes.Black;
+        }
+
+        private void vstavit(object sender, MouseButtonEventArgs e)
+        {
+            if (copiedImage == null) return;
+
+            Point pos = e.GetPosition(Miro);
+
+            Image img = new Image
+            {
+                Source = copiedImage,
+                Width = copiedImage.PixelWidth,
+                Height = copiedImage.PixelHeight
+            };
+
+            Canvas.SetLeft(img, pos.X);
+            Canvas.SetTop(img, pos.Y);
+
+            Miro.Children.Add(img);
+
+            Miro.MouseLeftButtonDown -= vstavit;
+            Cursor = Cursors.Arrow;
+            if (setka_check)
+                DrawSetkaChange();
+        }
+
+        private void Kopy_Click(object sender, RoutedEventArgs e)
+        {
+            if (setka_check)
+            {
+                for (int i = Miro.Children.Count - 1; i >= 0; i--)
+                {
+                    if (Miro.Children[i] is Line line && line.Stroke == Brushes.LightGray)
+                        Miro.Children.RemoveAt(i);
+                }
+            }
+
+            Copy();
+
+            if (setka_check)
+            {
+                double step = 10;
+                double width = Miro.ActualWidth;
+                double height = Miro.ActualHeight;
+
+                for (double y = 0; y < height; y += step)
+                {
+                    Line line = new Line
+                    {
+                        X1 = 0,
+                        Y1 = y,
+                        X2 = width,
+                        Y2 = y,
+                        Stroke = Brushes.LightGray,
+                        StrokeThickness = 1,
+                        IsHitTestVisible = false
+                    };
+                    Miro.Children.Add(line);
+                }
+
+                for (double x = 0; x < width; x += step)
+                {
+                    Line line = new Line
+                    {
+                        X1 = x,
+                        Y1 = 0,
+                        X2 = x,
+                        Y2 = height,
+                        Stroke = Brushes.LightGray,
+                        StrokeThickness = 1,
+                        IsHitTestVisible = false
+                    };
+                    Miro.Children.Add(line);
+                }
+            }
+        }
+
+        private void Vstavit_Click(object sender, RoutedEventArgs e)
+        {
+            if (copiedImage == null) return;
+
+            Cursor = Cursors.Cross;
+            Miro.MouseLeftButtonDown += vstavit;
+        }
+
+        private void Dell_Click(object sender, RoutedEventArgs e)
+        {
+            Delite();
+        }
+
+        private void Virezat_Click(object sender, RoutedEventArgs e)
+        {
+            if (setka_check)
+            {
+                for (int i = Miro.Children.Count - 1; i >= 0; i--)
+                {
+                    if (Miro.Children[i] is Line line && line.Stroke == Brushes.LightGray)
+                        Miro.Children.RemoveAt(i);
+                }
+            }
+
+            Copy();
+            Delite();
+
+            if (setka_check)
+            {
+                double step = 10;
+                double width = Miro.ActualWidth;
+                double height = Miro.ActualHeight;
+
+                for (double y = 0; y < height; y += step)
+                {
+                    Line line = new Line
+                    {
+                        X1 = 0,
+                        Y1 = y,
+                        X2 = width,
+                        Y2 = y,
+                        Stroke = Brushes.LightGray,
+                        StrokeThickness = 1,
+                        IsHitTestVisible = false
+                    };
+                    Miro.Children.Add(line);
+                }
+
+                for (double x = 0; x < width; x += step)
+                {
+                    Line line = new Line
+                    {
+                        X1 = x,
+                        Y1 = 0,
+                        X2 = x,
+                        Y2 = height,
+                        Stroke = Brushes.LightGray,
+                        StrokeThickness = 1,
+                        IsHitTestVisible = false
+                    };
+                    Miro.Children.Add(line);
+                }
+            }
+        }
+
+        private void obrezka()
+        {
+            if (vydelRect == null || vydelRect.Width <= 0 || vydelRect.Height <= 0)
+                return;
+
+            vydelRect.Stroke = Miro.Background;
+            SaveCanvasState();
+
+            double x = Canvas.GetLeft(vydelRect);
+            double y = Canvas.GetTop(vydelRect);
+            double width = vydelRect.Width;
+            double height = vydelRect.Height;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)Miro.ActualWidth, (int)Miro.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(Miro);
+
+            Int32Rect cropRect = new Int32Rect((int)x, (int)y, (int)width, (int)height);
+            CroppedBitmap cropped = new CroppedBitmap(rtb, cropRect);
+
+            Miro.Children.Clear();
+
+            Image img = new Image
+            {
+                Source = cropped,
+                Width = Miro.ActualWidth,
+                Height = Miro.ActualHeight,
+                Stretch = Stretch.Fill
+            };
+
+            Canvas.SetLeft(img, 0);
+            Canvas.SetTop(img, 0);
+            Miro.Children.Add(img);
+
+            vydelRect.Stroke = Brushes.Black;
+
+            Dell_vydel();
+        }
+
+
+        private void Obrezka_Click(object sender, RoutedEventArgs e)
+        {
+            if (vydel_check)
+                obrezka();
+            else
+                MessageBox.Show("Выдели область", "Спойлер");
+        }
+
+        private void povorot(double znachenie)
+        {
+            if (vydelRect == null || vydelRect.Width <= 0 || vydelRect.Height <= 0)
+                return;
+
+            vydelRect.Stroke = Miro.Background;
+            SaveCanvasState();
+
+            double x = Canvas.GetLeft(vydelRect);
+            double y = Canvas.GetTop(vydelRect);
+            double width = vydelRect.Width;
+            double height = vydelRect.Height;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)Miro.ActualWidth, (int)Miro.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(Miro);
+
+            Int32Rect cropRect = new Int32Rect((int)x, (int)y, (int)width, (int)height);
+            CroppedBitmap cropped = new CroppedBitmap(rtb, cropRect);
+
+            int newWidth = (znachenie % 180 == 0) ? (int)width : (int)height;
+            int newHeight = (znachenie % 180 == 0) ? (int)height : (int)width;
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                dc.PushTransform(new TranslateTransform(newWidth / 2, newHeight / 2));
+                dc.PushTransform(new RotateTransform(znachenie));
+                dc.PushTransform(new TranslateTransform(-width / 2, -height / 2));
+
+                dc.DrawImage(cropped, new Rect(0, 0, width, height));
+
+                dc.Pop(); dc.Pop(); dc.Pop();
+            }
+
+            RenderTargetBitmap rotated = new RenderTargetBitmap(newWidth, newHeight, 96, 96, PixelFormats.Pbgra32);
+            rotated.Render(dv);
+
+            Delite();
+
+            Image img = new Image
+            {
+                Source = rotated,
+                Width = newWidth,
+                Height = newHeight
+            };
+
+            double newX = x + (width - newWidth) / 2;
+            double newY = y + (height - newHeight) / 2;
+
+            Canvas.SetLeft(img, newX);
+            Canvas.SetTop(img, newY);
+            Miro.Children.Add(img);
+
+
+            Dell_vydel();
+        }
+
+        private double ShowInputDialog(string text, string caption)
+        {
+            Window inputDialog = new Window
+            {
+                Width = 300,
+                Height = 150,
+                Title = caption,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                ResizeMode = ResizeMode.NoResize,
+                Owner = this
+            };
+
+            StackPanel panel = new StackPanel { Margin = new Thickness(10) };
+
+            TextBlock message = new TextBlock { Text = text, Margin = new Thickness(0, 0, 0, 10) };
+            TextBox inputBox = new TextBox { Margin = new Thickness(0, 0, 0, 10) };
+            Button okButton = new Button { Content = "OK", Width = 60, IsDefault = true, HorizontalAlignment = HorizontalAlignment.Right };
+            okButton.Click += (_, __) => inputDialog.DialogResult = true;
+
+            panel.Children.Add(message);
+            panel.Children.Add(inputBox);
+            panel.Children.Add(okButton);
+            inputDialog.Content = panel;
+
+            if (inputDialog.ShowDialog() == true)
+                return Convert.ToDouble(inputBox.Text);
+            else
+                return 0;
+        }
+
+        private void Povorot_Click(object sender, RoutedEventArgs e)
+        {
+            if(vydel_check)
+                povorot(ShowInputDialog("Введите значение угла", "Значение"));
+            else
+                MessageBox.Show("Выдели область", "Спойлер");
+        }
+
+        private void save()
+        {
+            try
+            {
+                SaveCanvasState();
+
+                RenderTargetBitmap rtb = new RenderTargetBitmap(
+                    (int)Miro.ActualWidth,
+                    (int)Miro.ActualHeight,
+                    96, 96,
+                    PixelFormats.Pbgra32);
+
+                rtb.Render(Miro);
+
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(rtb));
+
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string fileName = $"Рисунок_{DateTime.Now:HH-mm-ss}.png";
+                string fullPath = System.IO.Path.Combine(desktop, fileName);
+
+                using (FileStream fs = new FileStream(fullPath, FileMode.Create))
+                {
+                    encoder.Save(fs);
+                }
+
+                MessageBox.Show($"Изображение сохранено на рабочем столе:\n{fileName}", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            save();
+        }
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Filter = "PNG Files|*.png|JPEG Files|*.jpg;*.jpeg|All Files|*.*";
+
+            bool? result = dlg.ShowDialog();
+            if (result != true) return;
+
+            string filePath = dlg.FileName;
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(filePath, UriKind.Absolute);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+
+            Image img = new Image
+            {
+                Source = bitmap,
+                Width = bitmap.PixelWidth,
+                Height = bitmap.PixelHeight
+            };
+
+            Canvas.SetLeft(img, 0);
+            Canvas.SetTop(img, 0);
+
+            Miro.Children.Add(img);
         }
     }
 }

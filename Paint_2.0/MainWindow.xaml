@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Paint_2._0"
         mc:Ignorable="d"
         Title="MainWindow" Height="850" Width="1500" KeyDown="Window_KeyDown">
-    <Grid Background="#808080">
+    <Grid x:Name="Grid1" Background="#808080">
         <Grid.RowDefinitions>
             <RowDefinition Height="25*"/>
             <RowDefinition Height="58*"/>
@@ -24,8 +24,8 @@
                 <Button.ContextMenu>
                     <ContextMenu>
                         <MenuItem x:Name="New" Header="Новый" Background="White" FontSize="14" Padding="3"/>
-                        <MenuItem x:Name="Open" Header="Открыть" Background="White" FontSize="14" Padding="3"/>
-                        <MenuItem x:Name="Save" Header="Сохранить" Background="White" FontSize="14" Padding="3"/>
+                        <MenuItem x:Name="Open" Header="Открыть" Background="White" FontSize="14" Padding="3" Click="Open_Click"/>
+                        <MenuItem x:Name="Save" Header="Сохранить" Background="White" FontSize="14" Padding="3" Click="Save_Click"/>
                         <MenuItem x:Name="Exit" Header="Выход" Background="White" FontSize="14" Padding="3" Click="Exit_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
@@ -35,9 +35,10 @@
                 <Button.ContextMenu>
                     <ContextMenu>
                         <MenuItem x:Name="Otmena" Header="Отменить действие" Background="White" FontSize="14" Padding="3" Click="Otmena_Click"/>
-                        <MenuItem Header="Вырезать" Background="White" FontSize="14" Padding="3"/>
-                        <MenuItem Header="Копировать" Background="White" FontSize="14" Padding="3"/>
-                        <MenuItem Header="Вставить" Background="White" FontSize="14" Padding="3"/>
+                        <MenuItem x:Name="Kopy" Header="Копировать" Background="White" FontSize="14" Padding="3" Click="Kopy_Click"/>
+                        <MenuItem x:Name="Vstavit" Header="Вставить" Background="White" FontSize="14" Padding="3" Click="Vstavit_Click"/>
+                        <MenuItem x:Name="Virezat" Header="Вырезать" Background="White" FontSize="14" Padding="3" Click="Virezat_Click"/>
+                        <MenuItem x:Name="Dell" Header="Удалить" Background="White" FontSize="14" Padding="3" Click="Dell_Click"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -75,15 +76,15 @@
             <Label Grid.Row="1" Grid.Column="3"  Content="Фигуры" FontSize="20" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF1BEF62"/>
             <Label Grid.Row="1" Grid.Column="4"  Content="Цвета" FontSize="20" Background="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF1BEF62"/>
 
-            <Button Grid.Row="0" Grid.Column="0" Margin="25,5,25,5" Background="#FFC8FFFF"/>
+            <Button x:Name="vydel" Grid.Row="0" Grid.Column="0" Margin="25,5,25,5" Background="#FFC8FFFF" Click="vydel_Click"/>
 
             <Grid Grid.Row="0" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Content="Обрезка" Background="{x:Null}" FontSize="20"/>
-                <Button Grid.Row="0" Grid.Column="1" Content="Поворот" Background="{x:Null}" FontSize="20"/>
+                <Button x:Name="Obrezka" Grid.Row="0" Grid.Column="0" Content="Обрезка" Background="{x:Null}" FontSize="20" Click="Obrezka_Click"/>
+                <Button x:Name="Povorot" Grid.Row="0" Grid.Column="1" Content="Поворот" Background="{x:Null}" FontSize="20" Click="Povorot_Click"/>
 
             </Grid>
 
