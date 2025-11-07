@@ -1,0 +1,77 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B42D197E-E27F-4CCC-880B-3DD99FF26B83}|Paint_2.0\\Paint_2.0.csproj|c:\\users\\krosh\\source\\repos\\paint_2.0\\paint_2.0\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B42D197E-E27F-4CCC-880B-3DD99FF26B83}|Paint_2.0\\Paint_2.0.csproj|solutionrelative:paint_2.0\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B42D197E-E27F-4CCC-880B-3DD99FF26B83}|Paint_2.0\\Paint_2.0.csproj|C:\\Users\\krosh\\source\\repos\\Paint_2.0\\paint_2.0\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{B42D197E-E27F-4CCC-880B-3DD99FF26B83}|Paint_2.0\\Paint_2.0.csproj|solutionrelative:paint_2.0\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "Paint_2.0\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml",
+              "RelativeToolTip": "Paint_2.0\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-10-25T11:58:07.773Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Paint_2.0\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\krosh\\source\\repos\\Paint_2.0\\Paint_2.0\\MainWindow.xaml.cs",
+              "RelativeToolTip": "Paint_2.0\\MainWindow.xaml.cs",
+              "ViewState": "AgIAANECAAAAAAAAAAAiwN4CAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T11:58:07.656Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
