@@ -14,6 +14,7 @@ namespace Paint_2._0
 {
     public partial class MainWindow : Window
     {
+        private string instrument = "Карандаш";
         public MainWindow()
         {
             InitializeComponent();
@@ -53,6 +54,7 @@ namespace Paint_2._0
 
         private bool setka_check = false;
 
+        
 
         private Stack<RenderTargetBitmap> history = new Stack<RenderTargetBitmap>();
 
@@ -457,6 +459,9 @@ namespace Paint_2._0
         private void Karandash_Click(object sender, RoutedEventArgs e)
         {
             karandash_check = true;
+            instrument = "Карандаш";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             zalivka_check = false;
             lastik_check = false;
@@ -472,6 +477,9 @@ namespace Paint_2._0
         private void Zalivka_Click(object sender, RoutedEventArgs e)
         {
             zalivka_check = true;
+            instrument = "Заливка";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             karandash_check = false;
             lastik_check = false;
@@ -487,6 +495,9 @@ namespace Paint_2._0
         private void Lastik_Click(object sender, RoutedEventArgs e)
         {
             lastik_check = true;
+            instrument = "Ластик";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             zalivka_check = false;
             karandash_check = false;
@@ -502,6 +513,9 @@ namespace Paint_2._0
         private void Text_Click(object sender, RoutedEventArgs e)
         {
             text_check = true;
+            instrument = "Текст";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             lastik_check = false;
             zalivka_check = false;
@@ -517,6 +531,9 @@ namespace Paint_2._0
         private void Liniy_Click(object sender, RoutedEventArgs e)
         {
             liniy_check = true;
+            instrument = "Линия";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             text_check = false;
             lastik_check = false;
@@ -532,6 +549,9 @@ namespace Paint_2._0
         private void Pryam_Click(object sender, RoutedEventArgs e)
         {
             pryam_check = true;
+            instrument = "Прямоугольник";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             liniy_check = false;
             karandash_check = false;
@@ -547,6 +567,9 @@ namespace Paint_2._0
         private void Eleps_Click(object sender, RoutedEventArgs e)
         {
             eleps_check = true;
+            instrument = "Эллепс";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             pryam_check = false;
             liniy_check = false;
@@ -562,6 +585,9 @@ namespace Paint_2._0
         private void Treug_Click(object sender, RoutedEventArgs e)
         {
             treug_check = true;
+            instrument = "Треугольник";
+            if (instrumentText != null)
+                instrumentText.Text = $"Инструмент: — {instrument}";
 
             eleps_check = false;
             pryam_check = false;
@@ -674,46 +700,67 @@ namespace Paint_2._0
             }
         }
 
-        private TextBlock statusBar;
-        private bool str_sost_check = false;
+        private Border strokaSostoyaniya;
+        private TextBlock mousePosText;
+        private TextBlock instrumentText;
+        private bool statusVisible = false;
 
         private void StrSost()
         {
-            if (statusBar == null)
+            if (strokaSostoyaniya == null)
             {
-                statusBar = new TextBlock
+                Grid parent = Miro.Parent as Grid;
+                if (parent == null) return;
+
+                int targetRow = 3;
+                while (parent.RowDefinitions.Count <= targetRow)
+                    parent.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                strokaSostoyaniya = new Border
                 {
-                    Text = "Строка состояния активна",
                     Background = Brushes.LightGray,
-                    Foreground = Brushes.Black,
-                    FontSize = 16,
-                    Padding = new Thickness(10),
-                    Height = 30,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    TextAlignment = TextAlignment.Center
+                    Height = 25,
+                    BorderBrush = Brushes.DarkGray,
+                    BorderThickness = new Thickness(1)
                 };
 
-                Grid parent = Miro.Parent as Grid;
+                DockPanel panel = new DockPanel();
 
-                if (parent != null)
+                mousePosText = new TextBlock
                 {
-                    parent.Children.Add(statusBar);
-                    Grid.SetRow(statusBar, 2);
-                }
+                    Text = "X: 0, Y: 0",
+                    Margin = new Thickness(10, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                DockPanel.SetDock(mousePosText, Dock.Left);
+                panel.Children.Add(mousePosText);
+
+                instrumentText = new TextBlock
+                {
+                    Text = $"Инструмент: — {instrument}",
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                panel.Children.Add(instrumentText);
+
+                strokaSostoyaniya.Child = panel;
+
+                parent.Children.Add(strokaSostoyaniya);
+                Grid.SetRow(strokaSostoyaniya, targetRow);
             }
 
-            str_sost_check = !str_sost_check;
+            statusVisible = !statusVisible;
+            strokaSostoyaniya.Visibility = statusVisible ? Visibility.Visible : Visibility.Collapsed;
 
-            if (str_sost_check)
+            Miro.UpdateLayout();
+
+            Miro.MouseMove += (s, e) =>
             {
-                statusBar.Visibility = Visibility.Visible;
-                Miro.Margin = new Thickness(0, 2, 0, 30);
-            }
-            else
-            {
-                statusBar.Visibility = Visibility.Collapsed;
-                Miro.Margin = new Thickness(0, 2, 0, 0);
-            }
+                if (!statusVisible) return;
+                Point p = e.GetPosition(Miro);
+                mousePosText.Text = $"X: {(int)p.X}, Y: {(int)p.Y}";
+            };
         }
 
         private void Setka_Click(object sender, RoutedEventArgs e)
