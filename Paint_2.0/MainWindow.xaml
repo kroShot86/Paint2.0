@@ -23,7 +23,7 @@
             <Button Grid.Row="0" Grid.Column="0" Content="Файл" Click="Menu_Click" FontSize="20" Padding="1" FontStyle="Italic" Background="{x:Null}">
                 <Button.ContextMenu>
                     <ContextMenu>
-                        <MenuItem x:Name="New" Header="Новый" Background="White" FontSize="14" Padding="3"/>
+                        <MenuItem x:Name="New" Header="Новый" Background="White" FontSize="14" Padding="3" Click="New_Click"/>
                         <MenuItem x:Name="Open" Header="Открыть" Background="White" FontSize="14" Padding="3" Click="Open_Click"/>
                         <MenuItem x:Name="Save" Header="Сохранить" Background="White" FontSize="14" Padding="3" Click="Save_Click"/>
                         <MenuItem x:Name="Exit" Header="Выход" Background="White" FontSize="14" Padding="3" Click="Exit_Click"/>
